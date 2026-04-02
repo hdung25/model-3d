@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình Xem Mô Hình 3D</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/meshoptimizer/meshopt_decoder.js"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background-color: #f0f0f0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        model-viewer { 
+            width: 100%; 
+            height: 100%; 
+            --poster-color: transparent;
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: #e0e0e0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+        
+        #progress {
+            height: 100%;
+            background-color: #2563eb;
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        #ar-button {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #3c4043;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #ar-button:active {
+            background-color: #f1f3f4;
+        }
+
+        /* Thông báo nếu model không load được */
+        #error-msg {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            text-align: center;
+            color: #333;
+            font-size: 15px;
+            max-width: 320px;
+        }
+        #error-msg a {
+            color: #2563eb;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <model-viewer 
+        src="https://drive.google.com/uc?export=download&id=1AnDytSFthVok44uosSeuE3Fu3bVrBbv8"
+        alt="Mô hình 3D Kỹ thuật" 
+        camera-controls 
+        auto-rotate 
+        shadow-intensity="1.2" 
+        shadow-softness="1"
+        exposure="1"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        crossorigin="anonymous">
+        
+        <div slot="progress-bar" id="progress-bar">
+            <div id="progress"></div>
+        </div>
+        
+        <button slot="ar-button" id="ar-button">
+            Xem thực tế (AR)
+        </button>
+
+    </model-viewer>
+
+    <!-- Hiện khi Google Drive chặn file -->
+    <div id="error-msg">
+        ⚠️ Không tải được mô hình.<br><br>
+        Google Drive đang chặn file do dung lượng lớn.<br><br>
+        <a href="https://drive.google.com/file/d/1AnDytSFthVok44uosSeuE3Fu3bVrBbv8/view" target="_blank">
+            👉 Tải file thủ công tại đây
+        </a>
+    </div>
+
+    <script>
+        const modelViewer = document.querySelector('model-viewer');
+        const progress = document.querySelector('#progress');
+        const progressBar = document.querySelector('#progress-bar');
+        const errorMsg = document.querySelector('#error-msg');
+
+        modelViewer.addEventListener('progress', (event) => {
+            const percent = event.detail.totalProgress * 100;
+            progress.style.width = percent + '%';
+            
+            if (percent === 100) {
+                setTimeout(() => {
+                    progressBar.style.opacity = '0';
+                    progressBar.style.transition = 'opacity 0.3s ease';
+                }, 300);
+            }
+        });
+
+        // Hiện thông báo lỗi nếu model không load được sau 15 giây
+        modelViewer.addEventListener('error', () => {
+            errorMsg.style.display = 'block';
+        });
+    </script>
+
+</body>
+</html>
